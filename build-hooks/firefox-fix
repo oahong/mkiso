@@ -1,0 +1,5 @@
+#! /bin/bash
+
+# we use firefox.desktop
+echo "Remove deprecated firefox{24,40}.desktop"
+rm -fv ${workbase}/squashfs-root/usr/share/applications/firefox{24,40}.desktop

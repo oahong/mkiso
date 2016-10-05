@@ -1,0 +1,14 @@
+#! /bin/bash
+
+work=/work/squashfs-root
+
+echo "lastore: Disable auto update"
+lastore_conf=${work}/etc/apt/apt.conf.d/99lastore.conf
+sed -e 's/APT::Update::Post-Invoke-Success/#&/' -i ${lastore_conf}
+sed -e 's/DPkg::Post-Invoke/#&/' -i ${lastore_conf}
+echo 'null'> ${work}/var/lib/lastore/update_infos.json
+
+echo "lastore: remove lastore-session-helper autostart"
+rm -f ${work}/lib/systemd/system/lastore-build-system-info.service
+#rm -f ${work}/etc/xdg/autostart/lastore-session-helper.desktop
+
