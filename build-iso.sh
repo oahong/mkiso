@@ -38,11 +38,12 @@ get_build_id() {
 # Pmon firmware: Append build id to boot.cfg
 fix_bootcfg() {
     local bootcfg=${1}/boot.cfg
-
-    #live boot
-    sed -e "/Deepin/s@Live.*@Live Build ${tagver}@" -i $bootcfg
-    #casper boot
-    sed -e "/^title/s@Deepin.*@Deepin 15 for Loongson Build${tagver}@" -i $bootcfg
+    if grep -wqs CDROM $bootcfg ; then
+        # fix live-cd / live-usb boot menu
+        sed -e "/Deepin/s@Live.*@Live Build ${tagver}@" -i $bootcfg
+    else
+        sed -e "/^title/s@Deepin.*@Deepin 15 for Loongson Build${tagver}@" -i $bootcfg
+    fi
 }
 
 # Kunlun firmware: Append build id to grub.cfg
