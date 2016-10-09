@@ -4,6 +4,10 @@ tagver=1
 workbase=/work
 full_date=$(date +%F)
 iso_dir=${workbase}/final/${full_date}
+boot_entries=(
+    ${workbase}/iso-boot/casper/boot
+    ${workbase}/iso-boot/boot
+)
 
 if [[ -f /.dockerenv || $(hostnamectl  | grep -wqs 'Chassis: container') -eq 0 ]] ; then
 	:
@@ -31,15 +35,21 @@ get_build_id() {
     fi
 }
 
-# TODO: grub support for kunlun firmware
+# Pmon firmware: Append build id to boot.cfg
 fix_bootcfg() {
-    local bootcfg=$1
+    local bootcfg=${1}/boot.cfg
     if grep -wqs CDROM $bootcfg ; then
         # fix live-cd / live-usb boot menu
         sed -e "/Deepin/s@Live.*@Live Build ${tagver}@" -i $bootcfg
     else
-        sed -e "/^title/s@Deepin.*@Deepin 15 for Loongson V${tagver}@" -i $bootcfg
+        sed -e "/^title/s@Deepin.*@Deepin 15 for Loongson Build${tagver}@" -i $bootcfg
     fi
+}
+
+# Kunlun firmware: Append build id to grub.cfg
+fix_grubcfg() {
+    local grubcfg=${1}/grub.cfg
+    sed -e "s/Deepin.*for/Deepin 15 build ${tagver} for" -i $grubcfg
 }
 
 fix_buildid() {
@@ -56,8 +66,11 @@ fix_buildid() {
 source umount.sh
 
 get_build_id ${workbase}/iso-boot/casper/boot/boot.cfg
-fix_bootcfg ${workbase}/iso-boot/casper/boot/boot.cfg
-fix_bootcfg ${workbase}/iso-boot/boot/boot.cfg
+
+for entry in ${boot_entries[@]} ; do
+    fix_bootcfg $entry
+    fix_grubcfg $entry
+done
 
 build_tag_str=${full_date}_v${tagver}
 build_iso=deepin15_mipsel_${build_tag_str}.iso
@@ -67,12 +80,12 @@ fix_buildid
 # run hooks
 run-parts -v --report --exit-on-error ${workbase}/build-hooks
 
-#exit 0
 rm -vf ${workbase}/iso-boot/casper/filesystem.squashfs
 edo mksquashfs  ${workbase}/squashfs-root/ ${workbase}/iso-boot/casper/filesystem.squashfs
 
 xorriso -as mkisofs -r -V "Deepin 2015 mipsel" -o ./$build_iso -cache-inodes /work/iso-boot
 
+#TODO: rewrite
 if [[ -e $build_iso ]] ; then
     [[ -d $iso_dir ]] || mkdir -pv $iso_dir
     md5sum $build_iso  >>  MD5SUM
