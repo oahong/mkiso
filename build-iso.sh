@@ -29,7 +29,7 @@ edo() {
 
 get_build_id() {
     local bootcfg=$1
-    tagver=$(awk '/^title/ { split($NF,a,"V" )  } END { print ++a[2]}' $bootcfg)
+    tagver=$(awk '/^title/ { split($NF,a,"Build" )  } END { print ++a[2]}' $bootcfg)
     if [[ $tagver -lt 100 ]] ; then
         tagver=107
     fi
@@ -52,7 +52,7 @@ fix_grubcfg() {
     #live boot
     sed -e "s/Deepin Live.*/Deepin Live Build ${tagver}/" -i $grubcfg
     #casper boot
-    sed -e "s/Deepin.*for/Deepin 15 build ${tagver} for" -i $grubcfg
+    sed -e "s/Deepin.*for/Deepin 15 build ${tagver} for/" -i $grubcfg
 }
 
 fix_buildid() {
