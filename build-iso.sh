@@ -51,7 +51,7 @@ fix_grubcfg() {
     local grubcfg=${1}/grub.cfg
 
     #live boot
-    sed -e "s/Deepin Live.*/Deepin Live Build ${tagver}/" -i $grubcfg
+    sed -e "s/Live.*for/Live Build ${tagver} for/" -i $grubcfg
     #casper boot
     sed -e "s/Deepin.*for/Deepin 15 build ${tagver} for/" -i $grubcfg
 }
