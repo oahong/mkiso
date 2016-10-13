@@ -50,10 +50,13 @@ fix_bootcfg() {
 fix_grubcfg() {
     local grubcfg=${1}/grub.cfg
 
-    #live boot
-    sed -e "s/Live.*for/Live Build ${tagver} for/" -i $grubcfg
-    #casper boot
-    sed -e "s/Deepin.*for/Deepin 15 build ${tagver} for/" -i $grubcfg
+    if grep -wqs Live $grubcfg ; then
+        #live boot
+        sed -e "s/Live.*for/Live Build ${tagver} for/" -i $grubcfg
+    else
+        #casper boot
+        sed -e "s/Deepin.*for/Deepin 15 build ${tagver} for/" -i $grubcfg
+    fi
 }
 
 fix_buildid() {
