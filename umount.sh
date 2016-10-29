@@ -3,7 +3,7 @@
 workdir=/work/squashfs-root
 
 if [[ -f /.dockerenv || $(hostnamectl  | grep -wqs 'Chassis: container') -eq 0 ]] ; then
-	if [[ -e ${workdir}/boot.cfg ]] ; then
+	if [[ -e ${workdir}/boot/boot.cfg ]] ; then
 		umount -v ${workdir}/boot
 	fi
 
